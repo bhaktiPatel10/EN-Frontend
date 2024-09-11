@@ -1,6 +1,6 @@
 // src/RegistrationPage.js
 
-import React, { useState } from 'react';
+import React from 'react';
 import { 
     Container, 
     TextField, 
@@ -9,27 +9,36 @@ import {
     Typography, 
     Box 
 } from '@mui/material';
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
+
+// Validation schema using Yup
+const validationSchema = Yup.object({
+    firstName: Yup.string().required('First Name is required'),
+    lastName: Yup.string().required('Last Name is required'),
+    email: Yup.string()
+        .email('Enter a valid email address')  // Enhanced email validation
+        .required('Email is required'),
+    password: Yup.string()
+        .min(6, 'Password must be at least 6 characters')
+        .required('Password is required'),
+    confirmPassword: Yup.string()
+        .oneOf([Yup.ref('password'), null], 'Passwords must match')  // Confirm password validation
+        .required('Confirm Password is required'),
+});
 
 function RegistrationPage() {
-    const [formData, setFormData] = useState({
+    const initialValues = {
         firstName: '',
         lastName: '',
         email: '',
-        password: ''
-    });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
+        password: '',
+        confirmPassword: '',
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log(formData);
-        // You can add your form submission logic here (e.g., API call)
+    const handleSubmit = (values) => {
+        console.log('Form Data', values);
+        // You can handle form submission here (API call, etc.)
     };
 
     return (
@@ -38,63 +47,93 @@ function RegistrationPage() {
                 <Typography component="h1" variant="h5">
                     Register
                 </Typography>
-                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                name="firstName"
-                                variant="outlined"
+                <Formik
+                    initialValues={initialValues}
+                    validationSchema={validationSchema}
+                    onSubmit={handleSubmit}
+                >
+                    {({ errors, touched, handleChange, handleBlur, values }) => (
+                        <Form style={{ width: '100%', marginTop: '1rem' }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        fullWidth
+                                        label="First Name"
+                                        name="firstName"
+                                        variant="outlined"
+                                        value={values.firstName}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        error={touched.firstName && Boolean(errors.firstName)}
+                                        helperText={touched.firstName && errors.firstName}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        fullWidth
+                                        label="Last Name"
+                                        name="lastName"
+                                        variant="outlined"
+                                        value={values.lastName}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        error={touched.lastName && Boolean(errors.lastName)}
+                                        helperText={touched.lastName && errors.lastName}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Email Address"
+                                        name="email"
+                                        variant="outlined"
+                                        value={values.email}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        error={touched.email && Boolean(errors.email)}
+                                        helperText={touched.email && errors.email}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Password"
+                                        name="password"
+                                        type="password"
+                                        variant="outlined"
+                                        value={values.password}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        error={touched.password && Boolean(errors.password)}
+                                        helperText={touched.password && errors.password}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Confirm Password"
+                                        name="confirmPassword"
+                                        type="password"
+                                        variant="outlined"
+                                        value={values.confirmPassword}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        error={touched.confirmPassword && Boolean(errors.confirmPassword)}
+                                        helperText={touched.confirmPassword && errors.confirmPassword}
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Button
+                                type="submit"
                                 fullWidth
-                                label="First Name"
-                                value={formData.firstName}
-                                onChange={handleChange}
-                                required
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                name="lastName"
-                                variant="outlined"
-                                fullWidth
-                                label="Last Name"
-                                value={formData.lastName}
-                                onChange={handleChange}
-                                required
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                name="email"
-                                variant="outlined"
-                                fullWidth
-                                label="Email Address"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                name="password"
-                                type="password"
-                                variant="outlined"
-                                fullWidth
-                                label="Password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                            />
-                        </Grid>
-                    </Grid>
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
-                    >
-                        Register
-                    </Button>
-                </Box>
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2 }}
+                            >
+                                Submit
+                            </Button>
+                        </Form>
+                    )}
+                </Formik>
             </Box>
         </Container>
     );

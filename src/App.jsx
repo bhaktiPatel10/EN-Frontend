@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import RegistrationPage from './Registration.jsx';
+import RegistrationPage from './components/Registration.jsx';
 // import HomePage from './HomePage';
 // import NotFoundPage from './NotFoundPage';
 

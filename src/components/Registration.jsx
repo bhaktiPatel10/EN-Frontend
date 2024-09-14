@@ -1,6 +1,6 @@
 // src/RegistrationPage.js
 
-import React from 'react';
+import React, {useState,useEffect} from 'react';
 import { 
     Container, 
     TextField, 
@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import useWebSocket from '../hooks/useWebSocket';
 
 // Validation schema using Yup
 const validationSchema = Yup.object({
@@ -28,17 +29,26 @@ const validationSchema = Yup.object({
 });
 
 function RegistrationPage() {
-    const initialValues = {
+    
+    const { message, sendMessage } = useWebSocket('wss://echo.websocket.org');
+    const[userdetails, setUserdetails] = useState({
         firstName: '',
         lastName: '',
         email: '',
         password: '',
         confirmPassword: '',
-    };
-
+    });
+    useEffect(() => {
+        console.log('Updated User Details:', userdetails);
+        sendMessage(JSON.stringify(userdetails));
+        console.log("websocket api::", message)
+          // You can handle form submission here (API call, etc.)
+    }, [userdetails,sendMessage]);  
+    
+   
     const handleSubmit = (values) => {
         console.log('Form Data', values);
-        // You can handle form submission here (API call, etc.)
+        setUserdetails(values)
     };
 
     return (
@@ -48,7 +58,7 @@ function RegistrationPage() {
                     Register
                 </Typography>
                 <Formik
-                    initialValues={initialValues}
+                    initialValues={userdetails}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
@@ -134,6 +144,9 @@ function RegistrationPage() {
                         </Form>
                     )}
                 </Formik>
+                <Box sx={{ marginTop: 2 }}>
+                    {message && <Typography variant="body1">WebSocket Response: {message}</Typography>}
+                </Box>
             </Box>
         </Container>
     );

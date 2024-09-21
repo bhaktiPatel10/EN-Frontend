@@ -39,7 +39,7 @@ const validationSchema = Yup.object({
         .required('Confirm Password is required'),
 });
 
-function RegistrationPage() {
+const RegistrationPage = () => {
     const navigate = useNavigate();
     const [successMessage, setSuccessMessage] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);

@@ -1,40 +1,40 @@
-// src/useWebSocket.js
-import React,{ useState, useEffect, useCallback } from 'react';
+// // src/useWebSocket.js
+// import React,{ useState, useEffect, useCallback } from 'react';
 
-const useWebSocket = (url) => {
-    const [socket, setSocket] = useState(null);
-    const [message, setMessage] = useState(null);
+// const useWebSocket = (url) => {
+//     const [socket, setSocket] = useState(null);
+//     const [message, setMessage] = useState(null);
 
-    useEffect(() => {
-        const ws = new WebSocket(url);
+//     useEffect(() => {
+//         const ws = new WebSocket(url);
 
-        ws.onopen = () => {
-            console.log('WebSocket connected');
-        };
+//         ws.onopen = () => {
+//             console.log('WebSocket connected');
+//         };
 
-        ws.onmessage = (event) => {
-            console.log("WebSocket :: 1", event.data)
-            setMessage(event.data);
-        };
+//         ws.onmessage = (event) => {
+//             console.log("WebSocket :: 1", event.data)
+//             setMessage(event.data);
+//         };
 
-        ws.onclose = () => {
-            console.log('WebSocket disconnected');
-        };
+//         ws.onclose = () => {
+//             console.log('WebSocket disconnected');
+//         };
 
-        setSocket(ws);
+//         setSocket(ws);
 
-        return () => {
-            ws.close();
-        };
-    }, [url]);
+//         return () => {
+//             ws.close();
+//         };
+//     }, [url]);
 
-    const sendMessage = useCallback((msg) => {
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(msg);
-        }
-    }, [socket]);
+//     const sendMessage = useCallback((msg) => {
+//         if (socket && socket.readyState === WebSocket.OPEN) {
+//             socket.send(msg);
+//         }
+//     }, [socket]);
 
-    return { message, sendMessage };
-};
+//     return { message, sendMessage };
+// };
 
-export default useWebSocket;
+// export default useWebSocket;

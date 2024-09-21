@@ -1,49 +1,45 @@
 // src/RegistrationPage.test.js
+
 import React from 'react';
-import { render, screen, fireEvent, waitFor,act } from '@testing-library/react';
-import '@testing-library/jest-dom'; // Import jest-dom
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import RegistrationPage from '../components/Registration.jsx';
 
+jest.mock('../services/APIservice.jsx'); // Mock the API service
 
-// Mock WebSocket
-const mockSend = jest.fn();
-const mockClose = jest.fn();
-const mockOnMessage = jest.fn();
-
-global.WebSocket = jest.fn(() => ({
-    send: mockSend,
-    close: mockClose,
-    onmessage: (callback) => {
-        mockOnMessage = callback;
-    },
-}));
-beforeEach(() => {
-    jest.clearAllMocks();
-});
-test('should send data to WebSocket and display the response', async () => {
-    render(<RegistrationPage />);
-
-    // Fill out the form
-    fireEvent.change(screen.getByLabelText(/First Name/i), { target: { value: 'John' } });
-    fireEvent.change(screen.getByLabelText(/Last Name/i), { target: { value: 'Doe' } });
-    fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'john.doe@example.com' } });
-    // Handle potential multiple elements with the same label
-    const passwordFields = screen.getAllByLabelText(/Password/i);
-    expect(passwordFields).toHaveLength(2);
-    fireEvent.change(passwordFields[0], { target: { value: 'password123' } });
-
-    const confirmPasswordFields = screen.getAllByLabelText(/Confirm Password/i);
-    expect(confirmPasswordFields).toHaveLength(1);
-    fireEvent.change(confirmPasswordFields[0], { target: { value: 'password123' } });
-    fireEvent.click(screen.getByText(/Submit/i));
-
-    // Simulate WebSocket message being received
-    act(() => {
-        mockOnMessage({ data: 'Echo: Hello World!' });
+describe('RegistrationPage', () => {
+    beforeEach(() => {
+        render(
+            <Router>
+                <RegistrationPage />
+            </Router>
+        );
     });
 
-    // Check for the WebSocket response being displayed
-    await waitFor(() => {
-        expect(screen.getByTestId('ws-message')).toHaveTextContent('WebSocket Response: Echo: Hello World!');
+    test('renders the registration form', () => {
+        expect(screen.getByLabelText(/first name/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/last name/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
+    });
+
+    test('validates required fields', async () => {
+        fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+        expect(await screen.findByText(/first name is required/i)).toBeInTheDocument();
+        expect(await screen.findByText(/last name is required/i)).toBeInTheDocument();
+        expect(await screen.findByText(/email is required/i)).toBeInTheDocument();
+    });
+});
+
+describe('RegistrationPage', () => {
+    // Existing tests...
+
+    test('matches snapshot', () => {
+        const { asFragment } = render(
+            <Router>
+                <RegistrationPage />
+            </Router>
+        );
+        expect(asFragment()).toMatchSnapshot();
     });
 });

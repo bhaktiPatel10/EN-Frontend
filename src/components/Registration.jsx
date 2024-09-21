@@ -148,6 +148,7 @@ function RegistrationPage() {
                                             label="Password"
                                             name="password"
                                             type="password"
+                                            id="pwd"
                                             variant="outlined"
                                             value={values.password}
                                             onChange={handleChange}
@@ -162,6 +163,7 @@ function RegistrationPage() {
                                             label="Confirm Password"
                                             name="confirmPassword"
                                             type="password"
+                                            id="confirmP"
                                             variant="outlined"
                                             value={values.confirmPassword}
                                             onChange={handleChange}

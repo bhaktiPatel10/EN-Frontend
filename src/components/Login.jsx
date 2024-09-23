@@ -72,7 +72,7 @@ const LoginPage = () => {
           <Typography variant="h5" align="left" sx={{ fontWeight: 'bold' }}>Login</Typography>
           <Typography variant="body2" align="left" sx={{ mt: 1, mb: 2 }}>
             Doesn't have an account yet?{' '}
-            <Link to="/" variant="body2" style={{ textDecoration: 'none', color: 'primary' }} className='Loginlink'>
+            <Link to="/register" variant="body2" style={{ textDecoration: 'none', color: 'primary' }} className='Loginlink'>
               Register here
             </Link>
           </Typography>

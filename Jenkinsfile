@@ -2,73 +2,84 @@ pipeline {
     agent any
 
     environment {
-        // You can define any environment variables here if needed
-        FRONTEND_DIR = './' // Adjust this if the Jenkinsfile is not in the root
+        DOCKER_CREDENTIALS = credentials('dockerhub-credentials')
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout Backend Code') {
             steps {
-                // Clone the frontend repository
-                git 'https://github.com/bhaktiPatel10/EN-Frontend'
+                // Clone your backend repository
+                git branch: 'master', url: 'https://github.com/WSMaan/examNinja-backend'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Checkout Frontend Code') {
             steps {
-                dir(FRONTEND_DIR) {
-                    // Install npm dependencies
+                // Clone your frontend repository into a separate directory
+                dir('frontend') {
+                    git branch: 'main', url: 'https://github.com/WSMaan/examNinja_frontend'
+                }
+            }
+        }
+
+        stage('Build Backend (Spring Boot)') {
+            steps {
+                dir('backend') {
+                    // Use Maven to build the Spring Boot app
+                    sh 'mvn clean package'
+                }
+            }
+        }
+
+        stage('Build Frontend (React)') {
+            steps {
+                dir('frontend') {
+                    // Use npm to install dependencies and build the React app
                     sh 'npm install'
-                }
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                dir(FRONTEND_DIR) {
-                    // Run tests using Jest or any other framework
-                    sh 'npm test'
-                }
-            }
-        }
-
-        stage('Build Frontend') {
-            steps {
-                dir(FRONTEND_DIR) {
-                    // Build the React application
                     sh 'npm run build'
                 }
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Docker Images') {
             steps {
-                dir(FRONTEND_DIR) {
-                    // Build a Docker image for the frontend
-                    sh 'docker build -t frontend-image:latest .'
+                script {
+                    // Build Docker images for both frontend and backend
+                    dir('backend') {
+                        sh 'docker build -t examninja123/backend-app .'
+                    }
+                    dir('frontend') {
+                        sh 'docker build -t examninja123/frontend-app .'
+                    }
                 }
             }
         }
 
-        stage('Deploy Frontend') {
+        stage('Push Docker Images') {
             steps {
-                // Deploy the built image or push it to a registry like DockerHub
-                echo 'Deploying frontend...'
-                // Example: Push Docker image to DockerHub
-                // sh 'docker push your-frontend-image:latest'
+                script {
+                    // Log in to DockerHub and push the images
+                    sh "docker login -u ${examninja123} -p ${ExamNinja@123}"
+                    sh 'docker push examninja123/backend-app'
+                    sh 'docker push examninja123/frontend-app'
+                }
             }
         }
+
+        // stage('Deploy to AWS EC2') {
+        //     steps {
+        //         script {
+        //             // Use SSH to connect to your EC2 instance and deploy using Docker Compose
+        //             sh 'ssh -i your-ec2-key.pem ec2-user@your-ec2-public-ip "docker-compose -f /path/to/docker-compose.yml up -d"'
+        //         }
+        //     }
+        // }
     }
 
     post {
         always {
-            echo 'Pipeline completed.'
-        }
-        success {
-            echo 'Frontend build succeeded!'
-        }
-        failure {
-            echo 'Frontend build failed!'
+            // Clean up after build
+            cleanWs()
         }
     }
 }

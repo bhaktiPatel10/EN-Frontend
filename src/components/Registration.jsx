@@ -61,7 +61,7 @@ const RegistrationPage = () => {
                 setSuccessMessage('Success! Your account has been created. You can now log in to your ExamNinja account.');
                 setErrorMessage(null);
                 setTimeout(() => {
-                    navigate('/login');
+                    navigate('/');
                 }, 3000);
             }
         } catch (error) {
@@ -186,7 +186,7 @@ const RegistrationPage = () => {
                     </Formik>
                     <Typography variant="body2" sx={{ mt: 2 }}>
                         Already have an account?{' '}
-                        <Link to="/login" variant="body2" style={{ textDecoration: 'none', color: 'primary' }} className='Loginlink'>
+                        <Link to="/" variant="body2" style={{ textDecoration: 'none', color: 'primary' }} className='Loginlink'>
                             Log In
                         </Link>
                     </Typography>
